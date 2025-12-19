@@ -13,13 +13,38 @@
     <h1>Contact Us (Demo)</h1>
     <p>Fill in the form below and we’ll get back to you.</p>
 
-    <form>
-      <input type="text" placeholder="Your Name" required>
-      <input type="email" placeholder="Your Email" required>
-      <textarea placeholder="Your Message" required></textarea>
+    <form id="contact-form">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <textarea id="message" placeholder="Your Message" required></textarea>
       <button type="submit">Send Message</button>
     </form>
+    <div id="response-message"></div>
   </div>
+
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+      
+      fetch('/api/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, email, message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('response-message').textContent = data.success || data.error;
+      })
+      .catch(error => {
+        document.getElementById('response-message').textContent = 'An error occurred. Please try again.';
+      });
+    });
+  </script>
 
 </body>
 </html>
