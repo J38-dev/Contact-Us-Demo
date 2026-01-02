@@ -55,7 +55,20 @@ def handler(event, context):
             
             server = smtplib.SMTP(os.environ.get('SMTP_SERVER', 'smtp.gmail.com'), 587)
             server.starttls()
-            server.login(os.environ.get('SMTP_USER'), os.environ.get('SMTP_PASS'))
+            smtp_user = os.environ.get('SMTP_USER')
+            smtp_pass = os.environ.get('SMTP_PASS')
+            if not smtp_user or not smtp_pass:
+                return {
+                    'statusCode': 500,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                    },
+                    'body': json.dumps({'error': 'SMTP credentials not configured'})
+                }
+            server.login(smtp_user, smtp_pass)
             server.sendmail(msg['From'], msg['To'], msg.as_string())
             server.quit()
             
