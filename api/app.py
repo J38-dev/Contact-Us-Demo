@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 import os
 
 def handler(event, context):
+    print("Handler called with event:", event)  # Debug log
     if event.get('httpMethod') == 'OPTIONS':
         return {
             'statusCode': 200,
@@ -16,6 +17,7 @@ def handler(event, context):
         }
     
     if event.get('path') == '/api/submit' and event.get('httpMethod') == 'POST':
+        print("Processing submit request")  # Debug log
         try:
             body = json.loads(event.get('body', '{}'))
             name = body.get('name')
@@ -24,6 +26,7 @@ def handler(event, context):
             
             # Basic validation
             if not all([name, email, message]):
+                print("Validation failed: missing fields")  # Debug log
                 return {
                     'statusCode': 400,
                     'headers': {
@@ -36,6 +39,7 @@ def handler(event, context):
                 }
             
             if '@' not in email:
+                print("Validation failed: invalid email")  # Debug log
                 return {
                     'statusCode': 400,
                     'headers': {
@@ -47,6 +51,7 @@ def handler(event, context):
                     'body': json.dumps({'error': 'Invalid email format'})
                 }
             
+            print("Sending email")  # Debug log
             # Send email
             msg = MIMEText(f"Name: {name}\nEmail: {email}\nMessage: {message}")
             msg['Subject'] = 'Contact Form Submission'
@@ -59,6 +64,7 @@ def handler(event, context):
             server.sendmail(msg['From'], msg['To'], msg.as_string())
             server.quit()
             
+            print("Email sent successfully")  # Debug log
             return {
                 'statusCode': 200,
                 'headers': {
@@ -70,6 +76,7 @@ def handler(event, context):
                 'body': json.dumps({'success': 'Message sent successfully'})
             }
         except Exception as e:
+            print("Error:", str(e))  # Debug log
             return {
                 'statusCode': 500,
                 'headers': {
@@ -81,6 +88,7 @@ def handler(event, context):
                 'body': json.dumps({'error': 'Failed to send message'})
             }
     
+    print("Not found")  # Debug log
     return {
         'statusCode': 404,
         'headers': {
