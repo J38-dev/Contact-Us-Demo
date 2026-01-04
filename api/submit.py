@@ -17,7 +17,7 @@ def handler(request):
     
     if request.method == 'POST':
         try:
-            body = json.loads(request.body)
+            body = json.loads(request.body.decode('utf-8'))
             name = body.get('name')
             email = body.get('email')
             message = body.get('message')
