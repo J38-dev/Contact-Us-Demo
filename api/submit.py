@@ -3,8 +3,8 @@ import smtplib
 from email.mime.text import MIMEText
 import os
 
-def handler(event, context):
-    if event.get('httpMethod') == 'OPTIONS':
+def handler(request):
+    if request.method == 'OPTIONS':
         return {
             'statusCode': 200,
             'headers': {
@@ -15,9 +15,9 @@ def handler(event, context):
             'body': ''
         }
     
-    if event.get('path') == '/api/submit' and event.get('httpMethod') == 'POST':
+    if request.method == 'POST':
         try:
-            body = json.loads(event.get('body', '{}'))
+            body = json.loads(request.body)
             name = body.get('name')
             email = body.get('email')
             message = body.get('message')
@@ -47,7 +47,6 @@ def handler(event, context):
                     'body': json.dumps({'error': 'Invalid email address'})
                 }
             
-            # Send email
             smtp_user = os.environ.get('SMTP_USER')
             smtp_pass = os.environ.get('SMTP_PASS')
             if not smtp_user or not smtp_pass:
@@ -62,7 +61,7 @@ def handler(event, context):
                     'body': json.dumps({'error': 'SMTP credentials not configured'})
                 }
             
-            server = smtplib.SMTP(os.environ.get('SMTP_SERVER', 'smtp.gmail.com'), 587)
+            server = smtplib.SMTP(os.environ.get('SMTP_SERVER', 'smtp.gmail.com'), 587, timeout=10)
             server.starttls()
             server.login(smtp_user, smtp_pass)
             msg = MIMEText(f"Name: {name}\nEmail: {email}\nMessage: {message}")
