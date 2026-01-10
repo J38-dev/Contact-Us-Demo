@@ -13,7 +13,8 @@
     <h1>Contact Us (Demo)</h1>
     <p>Fill in the form below and we’ll get back to you.</p>
 
-    <form id="contact-form">
+    <form action="https://api.web3forms.com/submit" method="POST" class="contact-form">
+      <input type="hidden" name="access_key" value="4819b1b4-a4f7-43a6-a6e6-bab22f3372b0">
       <input type="text" id="name" placeholder="Your Name" required>
       <input type="email" id="email" placeholder="Your Email" required>
       <textarea id="message" placeholder="Your Message" required></textarea>
